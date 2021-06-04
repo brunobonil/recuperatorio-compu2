@@ -19,7 +19,7 @@ def header(fd):
 def insert_header(fd, long):
     os.lseek(fd, 0, 0)
     head = os.read(fd, long)
-    new_file = os.open('r_tux.ppm', os.O_RDWR | os.O_CREAT)
+    new_file = os.open('r_dog.ppm', os.O_RDWR | os.O_CREAT)
     for i in head:
         os.write(new_file, bytes([i]))
 
@@ -30,7 +30,6 @@ def filtro_rojo(fd, name, size, inicio):
     name = 'r_' + name
     new_file = os.open(name, os.O_RDWR | os.O_CREAT)
     bytesarray = []
-    x = 0
     for i in lectura:
         bytesarray.append(bytes([i]))
     while bytesarray:
@@ -42,17 +41,18 @@ def filtro_rojo(fd, name, size, inicio):
                 if len(lista_bytes) == 3:
                     break
                 lista_bytes.append(i)
-            for i in lista_bytes:
-                x = lista_bytes.count(i)
-                if x > 1:
-                    lista_bytes[1] = j
-                    lista_bytes[2] = j
-                if lista_bytes.index(i) == 0:
-                    os.write(new_file, i)
-                if lista_bytes.index(i) == 1:
-                    os.write(new_file, j)
-                if lista_bytes.index(i) == 2:
-                    os.write(new_file, j)
+            lista_bytes[0]
+            os.write(new_file, i)
+            try:
+                lista_bytes[1]
+            except:
+                pass
+            os.write(new_file, j)
+            try:
+                lista_bytes[2]
+            except:
+                pass
+            os.write(new_file, j)
             lista_bytes.clear()
             if bytesarray:
                 for _ in range(3):
@@ -73,9 +73,10 @@ if __name__=='__main__':
     parser.add_argument('-s', '--size', help='Bloque que desea leer', type=int)
     args = parser.parse_args()
 
-    file = 'tux.ppm'
-    fd = os.open(file, os.O_RDONLY)
+    file = 'dog.ppm'
+    fd = os.open(file, os.O_RDWR)
     tope = header(fd)
     insert_header(fd, tope)
-    filtro_rojo(fd, file, 50, tope)
+    filtro_rojo(fd, file, 178829 , tope)
+    
     
