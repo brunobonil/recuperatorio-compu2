@@ -19,7 +19,7 @@ def header(fd):
 def insert_header(fd, long):
     os.lseek(fd, 0, 0)
     head = os.read(fd, long)
-    new_file = os.open('r_dog.ppm', os.O_RDWR | os.O_CREAT)
+    new_file = os.open('b_dog.ppm', os.O_RDWR | os.O_CREAT)
     for i in head:
         os.write(new_file, bytes([i]))
 
@@ -41,17 +41,36 @@ def filtro_rojo(fd, name, size, inicio):
                 if len(lista_bytes) == 3:
                     break
                 lista_bytes.append(i)
-            lista_bytes[0]
-            os.write(new_file, i)
-            try:
-                lista_bytes[1]
-            except:
-                pass
+            os.write(new_file, lista_bytes[0])
             os.write(new_file, j)
-            try:
-                lista_bytes[2]
-            except:
-                pass
+            os.write(new_file, j)
+            lista_bytes.clear()
+            if bytesarray:
+                for _ in range(3):
+                    bytesarray.pop(0)
+            else:
+                continue
+        os.lseek(new_file, inicio + size, 0)
+
+def filtro_verde(fd, name, size, inicio):
+    size = size - (size % 3) 
+    lectura = os.read(fd, size)
+    name = 'g_' + name
+    new_file = os.open(name, os.O_RDWR | os.O_CREAT)
+    bytesarray = []
+    for i in lectura:
+        bytesarray.append(bytes([i]))
+    while bytesarray:
+        os.lseek(new_file, inicio, 0)
+        lista_bytes = []
+        j = b'\x00'
+        while bytesarray:
+            for i in bytesarray:
+                if len(lista_bytes) == 3:
+                    break
+                lista_bytes.append(i)
+            os.write(new_file, j)
+            os.write(new_file, lista_bytes[1])
             os.write(new_file, j)
             lista_bytes.clear()
             if bytesarray:
@@ -61,6 +80,33 @@ def filtro_rojo(fd, name, size, inicio):
                 continue
         os.lseek(new_file, inicio + size, 0)
     
+def filtro_azul(fd, name, size, inicio):
+    size = size - (size % 3) 
+    lectura = os.read(fd, size)
+    name = 'b_' + name
+    new_file = os.open(name, os.O_RDWR | os.O_CREAT)
+    bytesarray = []
+    for i in lectura:
+        bytesarray.append(bytes([i]))
+    while bytesarray:
+        os.lseek(new_file, inicio, 0)
+        lista_bytes = []
+        j = b'\x00'
+        while bytesarray:
+            for i in bytesarray:
+                if len(lista_bytes) == 3:
+                    break
+                lista_bytes.append(i)
+            os.write(new_file, j)
+            os.write(new_file, j)
+            os.write(new_file, lista_bytes[2])
+            lista_bytes.clear()
+            if bytesarray:
+                for _ in range(3):
+                    bytesarray.pop(0)
+            else:
+                continue
+        os.lseek(new_file, inicio + size, 0)
         
 
 
@@ -77,6 +123,6 @@ if __name__=='__main__':
     fd = os.open(file, os.O_RDWR)
     tope = header(fd)
     insert_header(fd, tope)
-    filtro_rojo(fd, file, 178829 , tope)
+    filtro_azul(fd, file, 178829 , tope)
     
     
