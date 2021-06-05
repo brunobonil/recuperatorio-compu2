@@ -16,7 +16,7 @@ def header(fd):
         aux += 1    # Representa los saltos de línea
     return aux
 
-def filtro_rojo(fd, name, size, inicio):
+def filtro_rojo(fd, name, size, inicio, scale):
     ############# Inserta header en el archivo nuevo ###############
     os.lseek(fd, 0, 0)
     head = os.read(fd, inicio)
@@ -26,31 +26,36 @@ def filtro_rojo(fd, name, size, inicio):
         os.write(new_file, bytes([i]))
 
     size = size - (size % 3)
-    while             
-        lectura = os.read(fd, size)
-        new_file = os.open(name, os.O_RDWR)
-        bytesarray = []
-        for i in lectura:
-            bytesarray.append(bytes([i]))
+    lectura = os.read(fd, size)
+    new_file = os.open(name, os.O_RDWR)
+    bytesarray = []
+    for i in lectura:
+        bytesarray.append(bytes([i]))
+    while bytesarray:
+        os.lseek(new_file, inicio, 0)
+        lista_bytes = []
+        j = b'\x00'
+        x = 0
         while bytesarray:
-            os.lseek(new_file, inicio, 0)
-            lista_bytes = []
-            j = b'\x00'
-            while bytesarray:
-                for i in bytesarray:
-                    if len(lista_bytes) == 3:
-                        break
-                    lista_bytes.append(i)
-                os.write(new_file, lista_bytes[0])
-                os.write(new_file, j)
-                os.write(new_file, j)
-                lista_bytes.clear()
-                if bytesarray:
-                    for _ in range(3):
-                        bytesarray.pop(0)
-                else:
-                    continue
-        os.lseek(fd, inicio + size, 0)
+            for i in bytesarray:
+                if len(lista_bytes) == 3:
+                    break
+                lista_bytes.append(i)
+            # Calcula el valor del byte en decimal, lo escala al valor de r ingresado
+            # Y lo devuelve en bytes
+            x = int.from_bytes(lista_bytes[0], 'big')
+            x = x * scale
+            x = x.__round__()
+            if x > 255:
+                x = 255
+            x = x.to_bytes(1, 'big')
+            os.write(new_file, x)
+            os.write(new_file, j)
+            os.write(new_file, j)
+            lista_bytes.clear()
+            if bytesarray:
+                for _ in range(3):
+                    bytesarray.pop(0)
 
 def filtro_verde(fd, name, size, inicio):
     os.lseek(fd, 0, 0)
@@ -75,16 +80,21 @@ def filtro_verde(fd, name, size, inicio):
                 if len(lista_bytes) == 3:
                     break
                 lista_bytes.append(i)
+            # Calcula el valor del byte en decimal, lo escala al valor de r ingresado
+            # Y lo devuelve en bytes
+            x = int.from_bytes(lista_bytes[0], 'big')
+            x = x * scale
+            x = x.__round__()
+            if x > 255:
+                x = 255
+            x = x.to_bytes(1, 'big')
             os.write(new_file, j)
-            os.write(new_file, lista_bytes[1])
+            os.write(new_file, x)
             os.write(new_file, j)
             lista_bytes.clear()
             if bytesarray:
                 for _ in range(3):
                     bytesarray.pop(0)
-            else:
-                continue
-        os.lseek(new_file, inicio + size, 0)
     
 def filtro_azul(fd, name, size, inicio):
     os.lseek(fd, 0, 0)
@@ -109,9 +119,17 @@ def filtro_azul(fd, name, size, inicio):
                 if len(lista_bytes) == 3:
                     break
                 lista_bytes.append(i)
+            # Calcula el valor del byte en decimal, lo escala al valor de r ingresado
+            # Y lo devuelve en bytes
+            x = int.from_bytes(lista_bytes[0], 'big')
+            x = x * scale
+            x = x.__round__()
+            if x > 255:
+                x = 255
+            x = x.to_bytes(1, 'big')
             os.write(new_file, j)
             os.write(new_file, j)
-            os.write(new_file, lista_bytes[2])
+            os.write(new_file, x)
             lista_bytes.clear()
             if bytesarray:
                 for _ in range(3):
@@ -134,6 +152,6 @@ if __name__=='__main__':
     file = 'tux.ppm'
     fd = os.open(file, os.O_RDWR)
     tope = header(fd)
-    filtro_rojo(fd, file, 30, tope)
+    filtro_rojo(fd, file, 100000, tope, args.red)
     
     
