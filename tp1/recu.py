@@ -16,19 +16,27 @@ def header(fd):
         aux += 1    # Representa los saltos de línea
     return aux
 
-def insert_header(fd, long):
-    os.lseek(fd, 0, 0)
-    head = os.read(fd, long)
-    new_file = os.open('b_dog.ppm', os.O_RDWR | os.O_CREAT)
-    for i in head:
-        os.write(new_file, bytes([i]))
+# def insert_header(fd, long):
+#     os.lseek(fd, 0, 0)
+#     head = os.read(fd, long)
+#     new_file = os.open('b_dog.ppm', os.O_RDWR | os.O_CREAT)
+#     for i in head:
+#         os.write(new_file, bytes([i]))
 
 
 def filtro_rojo(fd, name, size, inicio):
-    size = size - (size % 3) 
-    lectura = os.read(fd, size)
+
+    ############# Inserta header en el archivo nuevo ###############
+    os.lseek(fd, 0, 0)
+    head = os.read(fd, inicio)
     name = 'r_' + name
     new_file = os.open(name, os.O_RDWR | os.O_CREAT)
+    for i in head:
+        os.write(new_file, bytes([i]))
+
+    size = size - (size % 3)
+    lectura = os.read(fd, size)
+    new_file = os.open(name, os.O_RDWR)
     bytesarray = []
     for i in lectura:
         bytesarray.append(bytes([i]))
@@ -53,10 +61,16 @@ def filtro_rojo(fd, name, size, inicio):
         os.lseek(new_file, inicio + size, 0)
 
 def filtro_verde(fd, name, size, inicio):
-    size = size - (size % 3) 
-    lectura = os.read(fd, size)
+    os.lseek(fd, 0, 0)
+    head = os.read(fd, inicio)
     name = 'g_' + name
     new_file = os.open(name, os.O_RDWR | os.O_CREAT)
+    for i in head:
+        os.write(new_file, bytes([i]))
+
+    size = size - (size % 3) 
+    lectura = os.read(fd, size)
+    new_file = os.open(name, os.O_RDWR)
     bytesarray = []
     for i in lectura:
         bytesarray.append(bytes([i]))
@@ -81,10 +95,16 @@ def filtro_verde(fd, name, size, inicio):
         os.lseek(new_file, inicio + size, 0)
     
 def filtro_azul(fd, name, size, inicio):
-    size = size - (size % 3) 
-    lectura = os.read(fd, size)
+    os.lseek(fd, 0, 0)
+    head = os.read(fd, inicio)
     name = 'b_' + name
     new_file = os.open(name, os.O_RDWR | os.O_CREAT)
+    for i in head:
+        os.write(new_file, bytes([i]))
+
+    size = size - (size % 3) 
+    lectura = os.read(fd, size)
+    new_file = os.open(name, os.O_RDWR)
     bytesarray = []
     for i in lectura:
         bytesarray.append(bytes([i]))
@@ -122,7 +142,7 @@ if __name__=='__main__':
     file = 'dog.ppm'
     fd = os.open(file, os.O_RDWR)
     tope = header(fd)
-    insert_header(fd, tope)
-    filtro_azul(fd, file, 178829 , tope)
+    #insert_header(fd, tope)
+    filtro_rojo(fd, file, 178829 , tope)
     
     
