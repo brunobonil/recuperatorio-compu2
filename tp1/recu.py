@@ -38,8 +38,6 @@ def filter_gen(header, name, color, scale, size, conn):
             for i in chunk:
                 lista_chunk.append(bytes([i]))
             for i in range(0, len(lista_chunk)-1, 3):
-                # if i == len(lista_chunk)-1:
-                #     break
                 lista_chunk[i] = escalar(lista_chunk[i], scale)
                 lista_chunk[i+1] = b'\x00'
                 lista_chunk[i+2] = b'\x00'
@@ -86,17 +84,17 @@ if __name__=='__main__':
     args.size = args.size - (args.size % 3)
 
     parent_pipe = []
-    child_conn = []
+    child_pipe = []
     for _ in range(3):
         p, h = Pipe()
         parent_pipe.append(p)
-        child_conn.append(h)
+        child_pipe.append(h)
 
     color = ['r_', 'g_', 'b_']
     scale_val = [args.red, args.green, args.blue]
     process = []
     for i in range(3):
-        p = Process(target=filter_gen, args=(lista_header[1], args.file, color[i], scale_val[i], args.size, child_conn[i]))
+        p = Process(target=filter_gen, args=(lista_header[1], args.file, color[i], scale_val[i], args.size, child_pipe[i]))
         process.append(p)
     
     for i in process:
@@ -110,7 +108,7 @@ if __name__=='__main__':
 
         if b'' in lectura and len(lectura) < args.size:
             break
-
+    os.close(fd)
     for i in process:
         i.join()
     
