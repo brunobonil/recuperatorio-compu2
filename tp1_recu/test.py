@@ -1,5 +1,6 @@
 from multiprocessing import Process, Pipe
 import os
+from typing import ByteString
 
 # def leer(file, size):
 #     fd = os.open(file, os.O_RDONLY)
@@ -17,6 +18,7 @@ def escalar(b, scale):
     b = b.to_bytes(1, 'big')
     return b
 
+
 def filter_gen(chunk, header, color):
     if color == 'r':
         fd = os.open('r_tux.ppm', os.O_RDWR | os.O_CREAT)
@@ -28,8 +30,7 @@ def filter_gen(chunk, header, color):
             lista_chunk[i] = escalar(lista_chunk[i], 1)
             lista_chunk[i+1] = b'\x00'
             lista_chunk[i+2] = b'\x00'
-        for i in lista_chunk:
-            os.write(fd, i)
+        os.write(fd,b''.join(lista_chunk))
     
     if color == 'g':
         fd = os.open('g_tux.ppm', os.O_RDWR | os.O_CREAT)
@@ -80,7 +81,6 @@ if __name__ == '__main__':
     os.lseek(fd, 0, 0)
     header = os.read(fd, len_header)
     filter_gen(chunk, header, 'r')
-    filter_gen(chunk, header, 'g')
-    filter_gen(chunk, header, 'b')
+
 
 

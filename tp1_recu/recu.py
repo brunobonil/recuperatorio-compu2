@@ -41,8 +41,7 @@ def filter_gen(header, name, color, scale, size, conn):
                 lista_chunk[i] = escalar(lista_chunk[i], scale)
                 lista_chunk[i+1] = b'\x00'
                 lista_chunk[i+2] = b'\x00'
-            for i in lista_chunk:
-                os.write(fd, i)
+            os.write(fd,b''.join(lista_chunk))
         
         if color == 'g_':
             lista_chunk = []
@@ -52,8 +51,7 @@ def filter_gen(header, name, color, scale, size, conn):
                 lista_chunk[i-1] = b'\x00'
                 lista_chunk[i] = escalar(lista_chunk[i], scale)
                 lista_chunk[i+1] = b'\x00'
-            for i in lista_chunk:
-                os.write(fd, i)
+            os.write(fd,b''.join(lista_chunk))
 
         if color == 'b_':
             lista_chunk = []
@@ -63,8 +61,7 @@ def filter_gen(header, name, color, scale, size, conn):
                 lista_chunk[i-2] = b'\x00'
                 lista_chunk[i-1] = b'\x00'
                 lista_chunk[i] = escalar(lista_chunk[i], scale)
-            for i in lista_chunk:
-                os.write(fd, i)
+            os.write(fd,b''.join(lista_chunk))
         if b'' in chunk and len(chunk) < size:
             conn.close()
             break
