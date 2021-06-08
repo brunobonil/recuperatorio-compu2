@@ -3,19 +3,19 @@ import argparse
 from multiprocessing import Pipe, Process
 import os
 from posix import O_RDONLY
-import sys
+
 
 def header(fd):
     leer_header = os.read(fd, 50)
-    leer_header = (leer_header.split(b'\n'))  # Crea una lista con los elementos del header separados por \n
+    leer_header = (leer_header.split(b'\n'))  
     len_header = 0
     for i in range(len(leer_header)):
-        if leer_header[i-1] == b'255':   # Compara el último elemento tomado por 'i'
+        if leer_header[i-1] == b'255':   
             break
         len_header += (len(leer_header[i]))
-        len_header += 1    # Representa los saltos de línea
+        len_header += 1    
     os.lseek(fd, 0, 0)
-    header = os.read(fd, len_header)
+    header = os.read(fd, len_header)    
     return [len_header, header]
 
 def escalar(b, scale):
@@ -79,9 +79,18 @@ if __name__=='__main__':
     parser.add_argument('-s', '--size', help='Bloque que desea leer', type=int)
     args = parser.parse_args()
 
-    fd = os.open(args.file, os.O_RDWR)
+    try:
+        fd = os.open(args.file, os.O_RDWR)
+    except FileNotFoundError:
+        print('ERROR: El archivo no existe')
+        exit(1)
     lista_header = header(fd)
+    
     args.size = args.size - (args.size % 3)
+    if args.size <= 0:
+        print("El valor size no puede ser negativo o cero")
+        exit(1)
+
 
     parent_pipe = []
     child_pipe = []
